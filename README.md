@@ -1,13 +1,9 @@
 
+![Hydra](https://github.com/user-attachments/assets/90bd300c-72d2-48fa-95c7-461c083b0506)
 
+## HyDRA: Hybrid Dynamic RAG Agents
 
-![[Hydra 2.png]]
-
-## <center> HyDRA: Hybrid Dynamic RAG Agents </center>
-
-** <center> An advanced, agentic AI framework that transforms Retrieval-Augmented Generation from a static pipeline into a dynamic, learning reasoning system.**</center>
-
-
+**An advanced, agentic AI framework that transforms Retrieval-Augmented Generation from a static pipeline into a dynamic, learning reasoning system.**
 
 <p align="center">
   <a href="https://github.com/hassenhamdi/hydra/stargazers">
@@ -28,18 +24,21 @@
 
 ## Table of Contents
 
-- [Announcements](##-Announcements)
-- [Why HyDRA?](##Why-hydra)
+- [Announcements](#-announcements)
+- [Why HyDRA?](#why-hydra)
 - [Core Features](#-core-features)
 - [Architectural Overview](#architectural-overview)
 - [Technical Overview](#-technical-overview)
 - [Project Structure](#-project-structure)
+- [DuckDuckGo Integration](#-duckduckgo-integration)
 - [Installation & Setup](#-installation--setup)
 - [Usage](#-usage)
 - [Future Roadmap](#-future-roadmap)
+- [Star History](#-star-history)
 - [Contributing](#-contributing)
 - [Acknowledgements & Foundational Work](#-acknowledgements--foundational-work)
 - [Citation](#-citation)
+- [License](#license)
 
 ---
 
@@ -152,7 +151,7 @@ In short, **HELP/SIMPSON** is what allows HyDRA to evolve from simply executing 
 
 ## 🪿 DuckDuckGo Integration
 
-![[hydra 1.png]]
+![hydra](https://github.com/user-attachments/assets/8ebbc4db-5f91-4315-bf5a-1d4acff7eafd)
 
 From the outset, HyDRA was designed to use practical, privacy-focused tools. Our choice of DuckDuckGo for web search was a strategic decision to ensure a **zero-friction setup** (no API key required) and to respect user privacy. Serendipitously, we discovered during development that searching for 'Hydra' on DuckDuckGo can reveal a multi-headed duck logo—a delightful revelation-like indicator that HyDRA project is a right choice.
 
