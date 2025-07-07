@@ -6,10 +6,10 @@
 **An advanced, agentic AI framework that transforms Retrieval-Augmented Generation from a static pipeline into a dynamic, learning reasoning system.**
 
 <p align="center">
-  <a href="https://github.com/hassenhamdi/hydra/stargazers">
-    <img src="https://img.shields.io/github/stars/hassenhamdi/hydra?style=social" alt="GitHub Stars">
+  <a href="https://github.com/hassenhamdi/HyDRA/stargazers">
+    <img src="https://img.shields.io/github/stars/hassenhamdi/HyDRA?style=social" alt="GitHub Stars">
   </a>
-  <a href="https://github.com/hassenhamdi/hydra/blob/main/LICENSE">
+  <a href="https://github.com/hassenhamdi/HyDRA/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   </a>
   <a href="https://www.python.org/downloads/release/python-3100/">
@@ -47,7 +47,7 @@
 *   **2025-07-07**: Initial public release of HyDRA! Featuring a three-layer agentic architecture and a state-of-the-art, three-stage retrieval pipeline.
 
 > [!NOTE]
-> ⚠️ **Initial Release Notice:** This is the first public version of HyDRA. The code is provided as-is and is currently untested. Bugs are expected! We encourage the community to help us find them. Please feel free to **[open an issue](https://github.com/hassenhamdi/hydra/issues)** to report bugs, request features, or ask questions.
+> ⚠️ **Initial Release Notice:** This is the first public version of HyDRA. The code is provided as-is and is currently untested. Bugs are expected! We encourage the community to help us find them. Please feel free to **[open an issue](https://github.com/hassenhamdi/HyDRA/issues)** to report bugs, request features, or ask questions.
 
 ---
 
@@ -203,8 +203,8 @@ hydra/
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/hassenhamdi/hydra.git
-cd hydra-rag
+git clone https://github.com/hassenhamdi/HyDRA.git
+cd HyDRA-rag
 pip install -r requirements.txt
 ```
 
@@ -253,7 +253,7 @@ Once inside the TUI, you can chat naturally or use slash commands like `/help` f
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=hassenhamdi/hydra&type=Date)](https://star-history.com/#hassen/hydra&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=hassenhamdi/HyDRA&type=Date)](https://star-history.com/#hassenhamdi/HyDRA&Date)
 
 ---
 
@@ -289,7 +289,7 @@ If you use HyDRA in your work, please cite our project:
   year         = {2025},
   publisher    = {GitHub},
   version      = {0.1.0},
-  url          = {https://github.com/hassenhamdi/hydra}
+  url          = {https://github.com/hassenhamdi/HyDRA}
 }
 ```
 
