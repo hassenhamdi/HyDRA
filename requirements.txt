@@ -1,0 +1,8 @@
+langchain
+langchain-core
+langchain-google-genai
+pymilvus[model]==2.4.5
+python-dotenv
+pyyaml
+duckduckgo-search
+rich
