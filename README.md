@@ -204,7 +204,7 @@ hydra/
 ### 1. Clone & Install
 ```bash
 git clone https://github.com/hassenhamdi/HyDRA.git
-cd HyDRA-rag
+cd HyDRA
 pip install -r requirements.txt
 ```
 
