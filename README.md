@@ -284,7 +284,7 @@ If you use HyDRA in your work, please cite our project:
 ```bibtex
 @software{hydra_agent_2025,
   author       = {Hassen Hamdi},
-  title        = {HyDRA: Hybrid Dynamic RAG Agent},
+  title        = {HyDRA: Hybrid Dynamic RAG Agents},
   month        = {July},
   year         = {2025},
   publisher    = {GitHub},
