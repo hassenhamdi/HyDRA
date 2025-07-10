@@ -273,6 +273,7 @@ We welcome contributions from the community! Whether it's reporting a bug, sugge
 *   **HiRA:** For the three-layer hierarchical reasoning architecture. ([Paper](https://arxiv.org/abs/2507.02652) | [Repo](https://github.com/ignorejjj/hira))
 *   **HM-RAG:** For the multi-agent, multi-source retrieval paradigm. ([Paper](https://arxiv.org/abs/2504.12330) | [Repo](https://github.com/ocean-luna/HMRAG))
 *   **HyDE:** For the hypothetical document embedding retrieval strategy. ([Paper](https://arxiv.org/abs/2212.10496) | [Repo](https://github.com/texttron/hyde))
+*   **Mem0:** For agents memories : ([Paper](https://arxiv.org/abs/2504.19413) | [Repo](https://github.com/mem0ai/mem0)]    
 *   **BGE-M3 & Milvus:** For the core embedding and vector database technologies that power our hybrid search.
 
 ---
