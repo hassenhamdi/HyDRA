@@ -20,9 +20,9 @@ profiles:
     milvus:
       collection_name: "hydra_knowledge_prod"
       dense_index:
-        index_type: "HNSW_SQ8"
+        index_type: "HNSW_SQ"
         metric_type: "IP"
-        build_params: { "M": 16, "efConstruction": 256 }
+        build_params: { "M": 16, "efConstruction": 256, "sq_type": "SQ8", }
       search_params: { "ef": 128 }
   
   production_hyperscale:
@@ -46,5 +46,5 @@ profiles:
       dense_index:
         index_type: "GPU_CAGRA"
         metric_type: "L2"
-        build_params: { "intermediate_graph_degree": 64, "graph_degree": 32, "cache_dataset_on_device": "true" }
+        build_params: { "intermediate_graph_degree": 32, "graph_degree": 64, "build_algo": "IVF_PQ", "cache_dataset_on_device": "true" }
       search_params: { "itopk_size": 64, "search_width": 8 }
