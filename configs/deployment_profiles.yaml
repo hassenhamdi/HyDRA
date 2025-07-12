@@ -1,81 +1,50 @@
-meta_planner:
-  planning_prompt: |
-    You are a master strategist. Your job is to decompose a complex user query into a series of simple, logical, and sequential sub-tasks.
-    Return a JSON list of strings, where each string is a distinct sub-task. The plan should be as efficient as possible. Do not create more than 5 sub-tasks.
+default_profile: "development"
 
-    User Query: {query}
-
-    JSON Plan:
-
-coordinator:
-  delegation_prompt: |
-    You are the Adaptive Coordinator. Your job is to select the single best executor for the given sub-task.
-    Consider the task's requirements and the strategic guidance from past performance.
-    Respond with ONLY the name of the best executor from the list.
-
-    **Available Executors:**
-    {executor_descriptions}
-
-    **Strategic Guidance from HELP System:**
-    {strategic_guidance}
-
-    **Sub-Task to Delegate:**
-    {sub_task}
-
-    Best Executor:
-
-synthesis_agent:
-  final_answer_prompt: |
-    You are the Synthesis Agent. Your role is to generate a final, comprehensive answer to the user's original query based on the provided context from executed sub-tasks.
-    If the context is insufficient, state what is missing.
-    Adhere to any user preferences provided.
-
-    **User Preferences:**
-    {user_preferences}
-
-    **Aggregated Context from Sub-Tasks:**
-    {context}
-    
-    **Original User Query:**
-    {query}
-
-    Final Answer:
-
-post_interaction_analyzer:
-  preference_inference_prompt: |
-    You are an expert user behavior analyst. Your task is to analyze a conversation transcript and infer the user's implicit preferences.
-    Identify patterns in their questions, follow-ups, and the final response they seemed to accept.
-    Focus on preferences related to:
-    - Information density (e.g., "prefers concise summaries", "likes detailed explanations").
-    - Formatting (e.g., "responds well to bullet points").
-    - Topics of interest (e.g., "frequently asks about machine learning").
-    
-    Do not invent preferences. Base your inferences strictly on the provided transcript.
-    If no clear preferences can be inferred, respond with an empty list.
-
-    Respond ONLY with a JSON list of strings.
-    Example: ["prefers answers to start with the main point", "shows interest in financial news"]
-
-    Conversation Transcript:
-    {transcript}
-
-    Inferred Preferences:
-
-advanced_vector_search_agent:
-  strategy_selection_prompt: |
-    You are a retrieval strategist. Based on the user's query, decide the best retrieval method.
-    - Use 'direct' for simple, keyword-based, or entity-focused queries.
-    - Use 'hyde' for complex, abstract, or conceptual queries that require deeper semantic understanding.
-
-    Respond with ONLY 'direct' or 'hyde'.
-
-    Query: {query}
-    Strategy:
-
-  hyde_generation_prompt: |
-    Based on the following query, please generate a detailed, comprehensive paragraph that fully answers it.
-    This paragraph will be used to find relevant documents. Do not include any preamble like "Here is a paragraph...".
-
-    Query: {query}
-    
-    Hypothetical Answer Paragraph:
+profiles:
+  development:
+    description: "Maximum accuracy for evaluation and debugging. Uses uncompressed vectors and indexes."
+    embedding:
+      use_fp16: false
+    milvus:
+      collection_name: "hydra_knowledge_dev"
+      dense_index:
+        index_type: "HNSW"
+        metric_type: "IP"
+        build_params: { "M": 32, "efConstruction": 512 }
+      search_params: { "ef": 256 }
+      
+  production_balanced:
+    description: "Recommended for most CPU/GPU production environments. Balances high speed, high accuracy, and 4x memory savings."
+    embedding:
+      use_fp16: true
+    milvus:
+      collection_name: "hydra_knowledge_prod"
+      dense_index:
+        index_type: "HNSW_SQ8"
+        metric_type: "IP"
+        build_params: { "M": 16, "efConstruction": 256 }
+      search_params: { "ef": 128 }
+  
+  production_hyperscale:
+    description: "For extremely large datasets on CPU where memory and cost are the primary constraints. Uses aggressive 32x binary quantization."
+    embedding:
+      use_fp16: false
+    milvus:
+      collection_name: "hydra_knowledge_hyperscale"
+      dense_index:
+        index_type: "IVF_RABITQ"
+        metric_type: "L2"
+        build_params: { "nlist": 4096, "refine": true, "refine_type": "SQ8" }
+      search_params: { "nprobe": 128, "refine_k": 2 }
+      
+  production_gpu_throughput:
+    description: "Optimized for high-throughput (QPS) on GPU hardware. Uses the advanced GPU_CAGRA index."
+    embedding:
+      use_fp16: true
+    milvus:
+      collection_name: "hydra_knowledge_gpu"
+      dense_index:
+        index_type: "GPU_CAGRA"
+        metric_type: "L2"
+        build_params: { "intermediate_graph_degree": 64, "graph_degree": 32, "cache_dataset_on_device": "true" }
+      search_params: { "itopk_size": 64, "search_width": 8 }
