@@ -7,14 +7,14 @@ from src.utils.config_loader import ConfigLoader
 
 MEMORY_COLLECTION = "hydra_memory_store"
 
-def setup_milvus(profile: str):
+def setup_milvus(profile: str='production_balanced'):
     ConfigLoader.load(profile)
     config = ConfigLoader.load()
     milvus_config = config['milvus']
     knowledge_collection_name = milvus_config['collection_name']
 
     print("Connecting to Milvus...")
-    client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_TOKEN"))
+    client = MilvusClient(uri='http://localhost:19530')
     
     if client.has_collection(knowledge_collection_name):
         client.drop_collection(knowledge_collection_name)
@@ -28,18 +28,22 @@ def setup_milvus(profile: str):
     knowledge_schema.add_field("sparse_vector", DataType.SPARSE_FLOAT_VECTOR)
 
     dense_index_config = milvus_config['dense_index']
-    index_params_dense = client.prepare_index_params(
+    index_params= client.prepare_index_params()
+    
+    index_params.add_index(
         field_name="dense_vector",
         index_type=dense_index_config['index_type'],
         metric_type=dense_index_config['metric_type'],
         params=dense_index_config['build_params']
     )
-    index_params_sparse = client.prepare_index_params(field_name="sparse_vector", index_type="SPARSE_INVERTED_INDEX", metric_type="IP")
+
+
+    index_params.add_index(field_name="sparse_vector", index_type="SPARSE_INVERTED_INDEX", metric_type="IP")
     
     client.create_collection(
         collection_name=knowledge_collection_name,
         schema=knowledge_schema,
-        index_params=[index_params_dense, index_params_sparse]
+        index_params=index_params
     )
     print("Knowledge collection created successfully.")
 
@@ -54,13 +58,17 @@ def setup_milvus(profile: str):
         memory_schema.add_field("vector", DataType.FLOAT_VECTOR, dim=1024)
         memory_schema.add_field("metadata", DataType.JSON) 
         
-        index_params_memory = client.prepare_index_params(field_name="vector", index_type="AUTOINDEX", metric_type="IP")
+        index_params_memory = client.prepare_index_params()
+        index_params_memory.add_index(field_name="vector", index_type="AUTOINDEX", metric_type="IP")
+        
         client.create_collection(
             collection_name=MEMORY_COLLECTION,
             schema=memory_schema,
-            index_params=[index_params_memory]
+            index_params=index_params_memory
         )
+
         print("Memory collection created successfully.")
+        
     else:
         print(f"Collection '{MEMORY_COLLECTION}' already exists.")
 
