@@ -245,7 +245,7 @@ Once inside the TUI, you can chat naturally or use slash commands like `/help` f
 ---
 
 ## 📝 Future Roadmap
--   [ ] **Fully debugging and fix issue within project, in its current state it is much like land full of mines (bugs 🐞🐞🐞).
+-   [ ] **Fully debugging and fix issue within project**. In its current state it is much like land full of mines (bugs 🐞🐞🐞).
 -   [ ] **Comprehensive Testing & Benchmarking:** Rigorously evaluate HyDRA's performance on standard RAG benchmarks (e.g., GAIA, HotpotQA) to quantify its accuracy and efficiency.
 -   [ ] **Full Multimodal Support:** Integrate vision and audio tools into dedicated `Executor` agents.
 
