@@ -3,48 +3,50 @@ import argparse
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymilvus import MilvusClient
-from pymilvus.model.hybrid import BGEM3EmbeddingFunction
 from dotenv import load_dotenv
-from src.utils.config_loader import ConfigLoader
+from src.utils.config_loader import ConfigLoader, get_config
+from src.services.model_registry import ModelRegistry
 from tqdm import tqdm
 
 def ingest_data(data_path: str, profile: str):
     """
-    Processes and ingests documents from a specified path into the Milvus
-    knowledge base according to the selected deployment profile.
+    Processes and ingests documents from a specified path (file or directory)
+    into the Milvus knowledge base.
     """
-    # 1. Load the specified deployment configuration
-    ConfigLoader.load(profile)
-    config = ConfigLoader.load()
-    embedding_config = config['embedding']
+    # ConfigLoader.load(profile) is called from the __main__ block
+    config = get_config()
     collection_name = config['milvus']['collection_name']
 
-    # 2. Initialize the BGE-M3 embedding function based on the profile
-    # This intelligently switches between CPU (FP32) and GPU (FP16)
-    use_gpu = embedding_config.get('use_fp16', False)
-    bge_m3_ef = BGEM3EmbeddingFunction(
-        use_fp16=use_gpu,
-        device="cuda" if use_gpu else "cpu"
-    )
-    print(f"BGE-M3 embedding function initialized on {'GPU (FP16)' if use_gpu else 'CPU (FP32)'}.")
+    # Get the pre-initialized embedding model from the registry
+    bge_m3_ef = ModelRegistry.get_embedding_model()
+    use_fp16 = config['embedding'].get('use_fp16', False)
+    print(f"Using pre-loaded BGE-M3 embedding function on {'GPU (FP16)' if use_fp16 else 'CPU (FP32)'}.")
 
-    # 3. Load Documents from the specified directory
+    # --- Smart Loading: Handle both file and directory paths ---
     print(f"Loading documents from '{data_path}'...")
-    loader = DirectoryLoader(
-        data_path, 
-        glob="**/*.{txt,md}", 
-        loader_cls=TextLoader, 
-        show_progress=True,
-        use_multithreading=True
-    )
-    docs = loader.load()
+    if os.path.isfile(data_path):
+        loader = TextLoader(data_path)
+        docs = loader.load()
+    elif os.path.isdir(data_path):
+        loader = DirectoryLoader(
+            data_path, 
+            glob="**/*.md",
+            loader_cls=TextLoader, 
+            show_progress=True,
+            use_multithreading=True
+        )
+        docs = loader.load()
+    else:
+        print(f"Error: Path '{data_path}' is not a valid file or directory.")
+        return
+
     if not docs:
-        print(f"Error: No documents found at path '{data_path}'. Please check the path and file extensions.")
+        print(f"Error: No documents found at path '{data_path}'.")
         return
 
     print(f"Loaded {len(docs)} document(s).")
 
-    # 4. Split Documents into manageable chunks
+    # --- Standard Ingestion Pipeline ---
     print("Splitting documents into chunks...")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     chunks = text_splitter.split_documents(docs)
@@ -53,34 +55,32 @@ def ingest_data(data_path: str, profile: str):
     sources = [chunk.metadata.get('source', 'Unknown') for chunk in chunks]
     print(f"Created {len(chunks)} chunks.")
 
-    # 5. Generate Dense and Sparse Embeddings
     print("Generating dense and sparse embeddings for all chunks...")
-    # The BGE-M3 function efficiently processes the list of texts
     embeddings = bge_m3_ef(chunk_texts)
     print("Embeddings generated successfully.")
     
-    # 6. Prepare Data entities for Milvus
     print("Preparing data for ingestion...")
     data_to_insert = []
     for i, text in enumerate(chunk_texts):
+        sparse_dict = {}
+        if hasattr(embeddings['sparse'][i], 'col'):
+            sparse_dict = dict(zip(embeddings['sparse'][i].col, embeddings['sparse'][i].data))
         data_to_insert.append({
             "source": sources[i],
             "chunk_text": text,
             "dense_vector": embeddings['dense'][i],
-            "sparse_vector": embeddings['sparse'][i],
+            "sparse_vector": sparse_dict,
         })
 
-    # 7. Ingest data into Milvus in batches
     print(f"Ingesting {len(data_to_insert)} chunks into Milvus collection '{collection_name}'...")
     client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_TOKEN"))
     
-    # Batch insert for efficiency, with a progress bar
     batch_size = 128
     with tqdm(total=len(data_to_insert), desc="Ingesting Batches") as pbar:
         for i in range(0, len(data_to_insert), batch_size):
             batch = data_to_insert[i:i + batch_size]
             try:
-                res = client.insert(collection_name=collection_name, data=batch)
+                client.insert(collection_name=collection_name, data=batch)
                 pbar.update(len(batch))
             except Exception as e:
                 print(f"\nAn error occurred during batch insertion: {e}")
@@ -91,7 +91,6 @@ def ingest_data(data_path: str, profile: str):
     print("Collection flushed successfully.")
 
 if __name__ == "__main__":
-    # Ensure environment variables are loaded for standalone execution
     load_dotenv()
     
     parser = argparse.ArgumentParser(description="Ingest documents into the HyDRA knowledge base.")
@@ -99,17 +98,20 @@ if __name__ == "__main__":
         "--path", 
         type=str, 
         required=True, 
-        help="Path to the directory containing documents to ingest."
+        help="Path to the file or directory of documents to ingest."
     )
     parser.add_argument(
         "--profile", 
         type=str, 
         required=True, 
-        help="The deployment profile to use (e.g., 'development', 'production_balanced')."
+        help="The deployment profile to use (e.g., 'development')."
     )
     args = parser.parse_args()
     
-    if not os.path.isdir(args.path):
-        print(f"Error: Provided path '{args.path}' is not a valid directory.")
+    if not os.path.exists(args.path):
+        print(f"Error: Provided path '{args.path}' does not exist.")
     else:
+        # Load config and initialize models *before* calling the main function
+        ConfigLoader.load(args.profile)
+        ModelRegistry.initialize_models()
         ingest_data(args.path, args.profile)

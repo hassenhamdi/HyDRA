@@ -4,7 +4,7 @@ profiles:
   development:
     description: "Maximum accuracy for evaluation and debugging. Uses uncompressed vectors and indexes."
     embedding:
-      use_fp16: false
+      use_fp16: true
     milvus:
       collection_name: "hydra_knowledge_dev"
       dense_index:

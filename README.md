@@ -1,7 +1,7 @@
 
-![HyDRA](https://github.com/user-attachments/assets/213dd4c2-d10b-41ab-b157-8b97a987305a)
+![HyDRA Banner](https://github.com/user-attachments/assets/213dd4c2-d10b-41ab-b157-8b97a987305a)
 
-## HyDRA: Hybrid Dynamic RAG Agents
+# HyDRA: Hybrid Dynamic RAG Agents
 
 **An advanced, agentic AI framework that transforms Retrieval-Augmented Generation from a static pipeline into a dynamic, learning reasoning system.**
 
@@ -22,32 +22,30 @@
 
 ---
 
-## Table of Contents
+## 🎬 Project Demo
 
-- [Announcements](#-announcements)
-- [Why HyDRA?](#why-hydra)
-- [Core Features](#-core-features)
-- [Architectural Overview](#architectural-overview)
-- [Technical Overview](#-technical-overview)
-- [Project Structure](#-project-structure)
-- [DuckDuckGo Integration](#-duckduckgo-integration)
-- [Installation & Setup](#-installation--setup)
-- [Usage](#-usage)
-- [Future Roadmap](#-future-roadmap)
-- [Star History](#-star-history)
-- [Contributing](#-contributing)
-- [Acknowledgements & Foundational Work](#-acknowledgements--foundational-work)
-- [Citation](#-citation)
-- [License](#license)
+See HyDRA in action! This video showcases the iterative reasoning process, the dynamic TUI, and the agent's ability to learn and adapt.
+
+[![HyDRA Project Demo](video)](assets/HyDRA_TUI.mp4)
+> *(Note: This is a placeholder. The video is coming soon!)*
 
 ---
 
-## 📢 Announcements
-
-*   **2025-07-07**: Initial public release of HyDRA! Featuring a three-layer agentic architecture and a state-of-the-art, three-stage retrieval pipeline.
-
-> [!NOTE]
-> ⚠️ **Initial Release Notice:** This is the first public version of HyDRA. The code is provided as-is and is currently untested. Bugs are expected! We encourage the community to help us find them. Please feel free to **[open an issue](https://github.com/hassenhamdi/HyDRA/issues)** to report bugs, request features, or ask questions.
+## Table of Contents
+- [Why HyDRA?](#why-hydra)
+- [The HyDRA Approach](#-the-hydra-approach)
+  - [1. Hierarchical Agents](#1-hierarchical-agents)
+  - [2. Iterative Reasoning (ReAct)](#2-iterative-reasoning-react)
+  - [3. Autonomous Learning (HELP/SIMPSON)](#3-autonomous-learning-helpsimpson)
+- [✨ Core Features](#-core-features)
+- [Architectural Overview](#-architectural-overview)
+- [🛠️ Technical Deep Dive](#️-technical-deep-dive)
+- [🚀 Installation & Setup](#-installation--setup)
+- [💻 Usage](#-usage)
+- [📝 Future Roadmap](#-future-roadmap)
+- [🤝 Contributing](#-contributing)
+- [Acknowledgements & Foundational Work](#-acknowledgements--foundational-work)
+- [License](#license)
 
 ---
 
@@ -57,56 +55,78 @@ The world of Retrieval-Augmented Generation is evolving at a breakneck pace. Gro
 
 HyDRA is an ambitious attempt to synthesize and build upon the core principles of several leading-edge projects:
 
-*   It adopts the robust, three-layer agentic structure from **HiRA** (Meta-Planner, Coordinator, Executors) to ensure a clean separation of strategy and execution.
-*   It implements the multi-agent, multi-source retrieval philosophy of **HM-RAG**, enabling it to query different knowledge sources through specialized agents.
-*   It leverages the **HyDE** technique within its vector search agent to bridge the semantic gap between user queries and stored documents.
+*   It adopts the robust, three-layer agentic structure from **HiRA** for a clean separation of strategy and execution.
+*   It implements the multi-agent, multi-source retrieval philosophy of **HM-RAG**.
+*   It leverages the **HyDE** technique to bridge the semantic gap between user queries and stored documents.
 *   It is powered by **Milvus**, used not just as a vector store but as a unified backend for hybrid search, RRF reranking, and agent memory.
 *   It utilizes the full potential of the **BGE-M3** model for state-of-the-art dense and sparse embeddings.
-*   The entire framework is built upon the flexible foundation provided by **LangChain**.
 
 HyDRA is our answer to building a RAG system that is not just powerful, but also intelligent, adaptive, and architecturally sound.
 
-### The HyDRA Metaphor
+## 🧠 The HyDRA Approach
 
-The name **HyDRA** is a direct metaphor for our agentic architecture: a single, powerful entity with multiple, specialized heads working in concert. Each "head" is an `Executor Agent` with a unique power (Vector Search, Web Research), directed by a central `Meta-Planner` brain.
+HyDRA's intelligence is built on three foundational pillars that work in concert:
+
+### 1. Hierarchical Agents
+A clear separation of concerns ensures robust and predictable behavior.
+- **Meta-Planner:** The strategist. It analyzes the user's query and the conversation history to determine the next logical step.
+- **Adaptive Coordinator:** The manager. It receives a task from the planner and delegates it to the most suitable specialist agent, guided by past performance data.
+- **Executors:** The specialists. A pool of agents with distinct tools, such as the `AdvancedVectorSearchAgent` for querying the internal knowledge base or the `DeepSearchAgent` for performing live web research.
+
+### 2. Iterative Reasoning (ReAct)
+Unlike traditional RAG pipelines that execute a fixed plan, HyDRA employs a dynamic **Reasoning-Acting loop**.
+1.  The `Meta-Planner` observes the current state and decides on the single best **action** to take next.
+2.  The `Coordinator` delegates this action to an `Executor`, which performs the task (e.g., a web search).
+3.  The result, or **observation**, is returned and appended to the history.
+4.  The loop repeats, with the planner using the full history of actions and observations to inform its next decision.
+
+This allows HyDRA to tackle complex, multi-hop questions, recover from failed steps, and adjust its strategy on the fly.
+
+### 3. Autonomous Learning (HELP/SIMPSON)
+The **Heuristic Experience-based Learning Policy (HELP)** system is HyDRA's long-term memory and self-improvement mechanism. After every user interaction, a four-stage learning cycle begins:
+1.  **Observe:** The `PostInteractionAnalyzer` agent reviews the full transcript of the conversation.
+2.  **Critique:** It evaluates the efficiency of each step, identifying which agent delegations were successful and which were not.
+3.  **Memorize:** It formulates and stores a concise, actionable "policy" in its Milvus memory (e.g., *"For recent events, web search is more effective than vector search"*). It also learns the user's implicit preferences (e.g., *"Prefers bullet-pointed lists"*).
+4.  **Adapt:** The next time the `AdaptiveCoordinator` faces a similar task, it retrieves this learned policy as "strategic guidance," enabling it to make smarter, experience-based decisions.
 
 ---
 
 ## ✨ Core Features
 
--   ✅ **Three-Layer Agentic Architecture:** A `Meta-Planner` for strategy, an `AdaptiveCoordinator` for delegation, and specialized `Executors` for task execution.
--   ✅ **State-of-the-Art Three-Stage Retrieval:** A pipeline that combines **Hybrid Search**, **Reciprocal Rank Fusion (RRF)**, and a final **BGE Reranker** stage for maximum precision.
--   ✅ **Autonomous Learning (HELP/SIMPSON):** A long-term strategic learning loop that analyzes past performance to optimize future agent delegation and planning.
--   ✅ **Adaptive Retrieval Strategies:** The `AdvancedVectorSearchAgent` can autonomously use techniques like **HyDE** for conceptual queries.
--   ✅ **Interactive TUI:** A rich, user-friendly Terminal User Interface for a seamless chat experience.
--   ✅ **Configurable Deployment Profiles:** Easily switch between `development`, `production_balanced`, `production_gpu_throughput`, and `hyperscale` profiles.
+-   ✅ **Three-Layer Agentic Architecture:** `Meta-Planner` for strategy, `AdaptiveCoordinator` for delegation, and specialized `Executors` for task execution.
+-   ✅ **Iterative ReAct-style Agents:** Moves beyond static plans to dynamic, multi-step reasoning for complex problem-solving.
+-   ✅ **Continuous Self-Improvement (HELP/SIMPSON):** A long-term learning loop that analyzes past performance to optimize future agent delegation and planning.
+-   ✅ **State-of-the-Art Retrieval Pipeline:** Combines **Hybrid Search** (dense + sparse vectors), **Reciprocal Rank Fusion (RRF)**, and a final **BGE Reranker** for maximum precision.
+-   ✅ **Adaptive Retrieval Strategies:** The `AdvancedVectorSearchAgent` can autonomously use techniques like **HyDE** for conceptual queries or perform multiple refined searches.
+-   ✅ **Interactive TUI with Streaming & Knowledge Management:** A rich Terminal User Interface with streaming responses and commands (`/save`, `/ingest`) to curate the agent's knowledge base.
+-   ✅ **Configurable Deployment Profiles:** Easily switch between `development`, `production_balanced`, and `hyperscale` profiles to manage performance and resource trade-offs.
 
 ---
 
-## Architectural Overview
+## 🗺️ Architectural Overview
 
-HyDRA's workflow is a three-layer system designed for maximum modularity. The `Meta-Planner` creates a high-level plan, which the `AdaptiveCoordinator` executes step-by-step by delegating to the best `Executor`. The `PostInteractionAnalyzer` reviews completed sessions to update the `MemoryAgent`, creating a continuous learning loop.
+HyDRA's workflow is a dynamic loop of strategy, execution, and learning. The `Meta-Planner` creates a step, the `Coordinator` delegates it, and `Executors` act. The `PostInteractionAnalyzer` reviews completed sessions to update the `MemoryAgent`, creating a continuous cycle of improvement.
 
 ```mermaid
 graph TD
-    subgraph "Layer 1: Strategy"
+    subgraph "Layer 1: Strategy (ReAct Loop)"
         A[User Query] --> Planner{Meta-Planner Agent};
-        Planner -- "1 Decomposes Query" --> Plan([Plan of Sub-tasks]);
+        Planner -- "1. Devises Next Action" --> Plan([Single Sub-task]);
     end
 
     subgraph "Layer 2: Coordination & Memory"
         Plan --> Coord{Adaptive Coordinator};
-        Coord -- "3 Get Context" --> Memory[MemoryAgent];
-        Memory -- "Personalization & Strategic Guidance" --> Coord;
+        Coord -- "3. Get Context & Guidance" --> Memory[MemoryAgent];
+        Memory -- "Personalization & Learned Policies" --> Coord;
     end
     
     subgraph "Layer 3: Execution & Tools"
         Executors((Executor Pool));
         VSA[AdvancedVectorSearchAgent];
-        DSA[DeepSearchAgent];
+        DSA[DeepSearchAgent (Web)];
     end
 
-    Coord -- "4 Delegate Sub-task" --> Executors;
+    Coord -- "4. Delegate Sub-task" --> Executors;
     
     subgraph "Data & Knowledge Layer"
         Milvus[Unified Milvus Backend<br>- Hybrid Vectors<br>- Memory Store];
@@ -116,117 +136,92 @@ graph TD
     VSA --> Milvus;
     DSA --> Internet;
 
-    subgraph "Synthesis & Learning Loop"
-        VSA & DSA -- "Result" --> Synth{Synthesis Agent};
-        Synth --> FinalAnswer[Final Answer];
-        FinalAnswer -- "Transcript" --> Analyzer{Post-Interaction Analyzer};
+    subgraph "Synthesis & Learning"
+        Executors -- "5. Result / Observation" --> Synth{Synthesis Agent};
+        Synth -- "Appends to History & Planner" --> Planner;
+        Synth --> FinalAnswer[Final Answer Stream];
+        FinalAnswer -- "Full Transcript" --> Analyzer{Post-Interaction Analyzer};
         Analyzer -- "Learns & Updates" --> Memory;
     end
 ```
 
 ---
 
-## 🛠️ Technical Overview
+## 🛠️ Technical Deep Dive
 
-*   **Hybrid Search:** Combines semantic **Vector Search** with keyword-based **Lexical Search**.
-*   **Embeddings (BGE-M3):** Uses **dense vectors** for meaning and **sparse vectors** for keywords. Supports **FP16** model quantization for GPU acceleration.
-*   **Reciprocal Rank Fusion (RRF):** Merges dense and sparse search results efficiently within Milvus.
-*   **Reranking Model (BGE-Reranker):** A powerful cross-encoder model that re-ranks fused candidates for maximum contextual relevance.
-*   **Vector Quantization:** Supports database-level quantization (`HNSW_SQ8`, `IVF_RABITQ`) for scalable, cost-effective production deployments.
-
-### **Brief Explanation for 'HELP/SIMPSON'**
-
-#### **Autonomous Learning (HELP/SIMPSON)**
-
-The **HELP (Heuristic Experience-based Learning Policy)** system, nicknamed **SIMPSON**, is HyDRA's mechanism for long-term strategic learning. It enables the agent to autonomously improve its decision-making over time by learning from past performance.
-
-It operates in a simple, four-stage loop that occurs *after* a user interaction is complete:
-
-1.  **Observe:** The `PostInteractionAnalyzer` agent reviews the full transcript of the conversation, including the plan created by the `Meta-Planner` and the results from each `Executor`.
-2.  **Learn & Critique:** It evaluates the efficiency and success of each step. It identifies which agent delegations led to quick, accurate results (a success) and which were inefficient or required corrective follow-up actions (a failure).
-3.  **Memorize:** This critique is stored as structured "policy memory" in Milvus. Each memory entry links a type of sub-task to the performance of the agent chosen for it.
-4.  **Adapt:** The next time the `AdaptiveCoordinator` faces a similar sub-task, it retrieves this policy memory. This "strategic guidance" helps it make a more intelligent, experience-based decision, allowing it to repeat successful strategies and avoid past mistakes.
-
-In short, **HELP/SIMPSON** is what allows HyDRA to evolve from simply executing tasks to learning the *best way* to execute them, making the entire system smarter and more efficient with every query it solves.
-
-## 🪿 DuckDuckGo Integration
-
-![hydra](https://github.com/user-attachments/assets/8ebbc4db-5f91-4315-bf5a-1d4acff7eafd)
-
-From the outset, HyDRA was designed to use practical, privacy-focused tools. Our choice of DuckDuckGo for web search was a strategic decision to ensure a **zero-friction setup** (no API key required) and to respect user privacy. Serendipitously, we discovered during development that searching for 'Hydra' on DuckDuckGo can reveal a multi-headed duck logo—a delightful revelation-like indicator that HyDRA project is a right choice.
-
-## 📂 Project Structure
-```
-hydra/
-├── .env.example
-├── README.md
-├── requirements.txt
-├── main.py
-├── configs/
-│   ├── deployment_profiles.yaml
-│   └── agents.yaml
-├── data_processing/
-│   └── ingest.py
-└── src/
-    ├── __init__.py
-    ├── agents/
-    │   ├── __init__.py
-    │   ├── meta_planner.py, adaptive_coordinator.py, ...
-    │   └── executors/
-    │       ├── __init__.py
-    │       └── vector.py, deep_search.py
-    ├── core/
-    │   ├── __init__.py
-    │   └── reasoning_loop.py
-    ├── retrieval/
-    │   ├── __init__.py
-    │   └── engine.py
-    ├── services/
-    │   ├── __init__.py
-    │   └── milvus_setup.py
-    ├── tui/
-    │   ├── __init__.py
-    │   └── handler.py
-    └── utils/
-        ├── __init__.py
-        └── config_loader.py
-```
+-   **Hybrid Search:** Combines semantic **Vector Search** (dense vectors for meaning) with keyword-based **Lexical Search** (sparse vectors for keywords) using the **BGE-M3** model.
+-   **Reciprocal Rank Fusion (RRF):** Merges the dense and sparse search results efficiently within Milvus for a unified ranking.
+-   **Reranking:** A powerful **BGE-Reranker** cross-encoder model re-ranks the fused candidates for maximum contextual relevance, ensuring the most precise results are at the top.
+-   **Vector Quantization:** Supports database-level quantization (`HNSW_SQ8`, `IVF_RABITQ`) for scalable, cost-effective production deployments, configurable via profiles.
+-   **Model Management:** A central `ModelRegistry` ensures that large embedding and reranker models are loaded into memory only once, optimizing resource usage.
 
 ---
 
 ## 🚀 Installation & Setup
 
-### Prerequisites
-*   Python 3.10+
-*   An active Milvus instance (Milvus Lite is used by default).
-*   A Google Gemini API Key.
+### 1. Prerequisites
+-   Python 3.10+
+-   A Google Gemini API Key.
+-   Docker and Docker Compose (for running Milvus).
 
-### 1. Clone & Install
+### 2. Install Milvus Standalone (Recommended)
+Choose the instructions for your operating system.
+
+<details>
+<summary><b>🐧 For Linux & macOS</b></summary>
+
+The quickest way to get started is with the official installation script.
+
+```bash
+# Download the script
+curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+
+# Start Milvus and its dependencies
+bash standalone_embed.sh start
+
+# To stop the services later
+# bash standalone_embed.sh down
+```
+</details>
+
+<details>
+<summary><b>❖ For Windows</b></summary>
+
+On Windows, Milvus runs via Docker Desktop with WSL2.
+
+1.  **Ensure Docker Desktop is installed** and configured to use the WSL2 backend.
+2.  **Follow the official guide:** [Milvus Docs - Install on Windows](https://milvus.io/docs/install_standalone-windows.md)
+    - This involves downloading a `docker-compose.yml` file and running `docker-compose up -d` in your terminal.
+</details>
+
+### 3. Clone HyDRA & Install Dependencies
 ```bash
 git clone https://github.com/hassenhamdi/HyDRA.git
 cd HyDRA
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment
-Create a `.env` file from the example and add your API key:
+### 4. Configure Environment
+Create a `.env` file from the example and add your API key. The default `MILVUS_URI` is already configured for the standard Milvus setup.
 ```bash
 cp .env.example .env
 # Now, edit .env and add your GEMINI_API_KEY
 ```
 
-### 3. Setup Milvus Collections
-Run the setup script with your desired initial profile. This only needs to be done once per profile.
+### 5. Setup Milvus Collections
+This script connects to your running Milvus instance and creates the necessary collections for HyDRA.
 ```bash
 python -m src.services.milvus_setup --profile development
 ```
 
-### 4. Ingest Your Data
-Place your documents (e.g., `.txt`, `.md`) in a `data/` directory and run the ingestion script.
+### 6. Ingest Your Data
+Place your documents (at the moment it support only md files) in the `data/` directory and run the ingestion script.
 ```bash
+# Create the directory if it doesn't exist and add your files
 mkdir -p data
-# Add your files to the data/ directory...
+# ...add your documents to data/...
 
+# Run the ingestion process
 python -m data_processing.ingest --path ./data --profile development
 ```
 
@@ -234,26 +229,24 @@ python -m data_processing.ingest --path ./data --profile development
 
 ## 💻 Usage
 
-Launch the interactive TUI chat application. You can specify a user ID and performance profile.
+Launch the interactive Terminal User Interface (TUI). You can specify a user ID for personalization and a performance profile.
 
 ```bash
 python main.py --profile production_balanced --user_id alex
 ```
 
-Once inside the TUI, you can chat naturally or use slash commands like `/help` for more control.
+
+Once inside, you can chat naturally or use slash commands for more control:
+-   `/help`: View all available commands.
+-   `/save`: Save the last generated report.
+-   `/ingest`: Ingest a saved report back into the knowledge base.
+-   `/new`: Start a new conversation session.
 
 ---
 
 ## 📝 Future Roadmap
--   [ ] **Fully debugging and fix issue within project**. In its current state it is much like land full of mines (bugs 🐞🐞🐞).
--   [ ] **Comprehensive Testing & Benchmarking:** Rigorously evaluate HyDRA's performance on standard RAG benchmarks (e.g., GAIA, HotpotQA) to quantify its accuracy and efficiency.
--   [ ] **Full Multimodal Support:** Integrate vision and audio tools into dedicated `Executor` agents.
 
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=hassenhamdi/HyDRA&type=Date)](https://star-history.com/#hassenhamdi/HyDRA&Date)
+Our detailed roadmap is now tracked in [`roadmap.md`](./roadmap.md). Key upcoming features include comprehensive benchmarking, autonomous knowledge curation with temporal intelligence, and full multimodal support.
 
 ---
 
@@ -263,38 +256,19 @@ We welcome contributions from the community! Whether it's reporting a bug, sugge
 
 ---
 
-## 🤲 Acknowledgements & Foundational Work
+## 🙏 Acknowledgements & Foundational Work
 
 - First and foremost I praise and thank Allah.
 - My family.
 
-- HyDRA architecture is a synthesis and extension of several groundbreaking concepts from the AI research community. We gratefully acknowledge the foundational work of the following papers and projects:
-
-*   **HiRA:** For the three-layer hierarchical reasoning architecture. ([Paper](https://arxiv.org/abs/2507.02652) | [Repo](https://github.com/ignorejjj/hira))
-*   **HM-RAG:** For the multi-agent, multi-source retrieval paradigm. ([Paper](https://arxiv.org/abs/2504.12330) | [Repo](https://github.com/ocean-luna/HMRAG))
-*   **HyDE:** For the hypothetical document embedding retrieval strategy. ([Paper](https://arxiv.org/abs/2212.10496) | [Repo](https://github.com/texttron/hyde))
-*   **Mem0:** For agents memories : ([Paper](https://arxiv.org/abs/2504.19413) | [Repo](https://github.com/mem0ai/mem0)]    
-*   **BGE-M3 & Milvus:** For the core embedding and vector database technologies that power our hybrid search.
-
----
-
-## 📄 Citation
-
-If you use HyDRA in your work, please cite our project:
-
-```bibtex
-@software{hydra_agent_2025,
-  author       = {Hassen Hamdi},
-  title        = {HyDRA: Hybrid Dynamic RAG Agents},
-  month        = {July},
-  year         = {2025},
-  publisher    = {GitHub},
-  version      = {0.1.0},
-  url          = {https://github.com/hassenhamdi/HyDRA}
-}
-```
+- HyDRA's architecture is a synthesis and extension of several groundbreaking concepts. We gratefully acknowledge the foundational work of:
+    *   **HiRA:** For the three-layer hierarchical reasoning architecture. ([Paper](https://arxiv.org/abs/2507.02652))
+    *   **HM-RAG:** For the multi-agent, multi-source retrieval paradigm. ([Paper](https://arxiv.org/abs/2504.12330))
+    *   **HyDE:** For the hypothetical document embedding retrieval strategy. ([Paper](https://arxiv.org/abs/2212.10496))
+    *   **Mem0:** For the inspiration behind agent memory systems. ([Paper](https://arxiv.org/abs/2504.19413))
+    *   **BGE-M3 & Milvus:** For the core embedding and vector database technologies that power our hybrid search.
 
 ---
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](./LICENSE).

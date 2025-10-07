@@ -1,0 +1,23 @@
+# Milvus data
+volumes/
+
+# Local environment setup
+embedEtcd.yaml
+standalone_embed.sh
+
+# personal api key and configuration. 
+.env
+
+logs/
+tests
+
+src/agents/__pycache__
+src/core/__pycache__
+src/retrieval/__pycache__
+src/services/__pycache__
+src/tui/__pycache__
+src/utils/__pycache__
+docs/
+commit_message.txt
+commit.txt
+

@@ -1,21 +1,22 @@
 import os
 import argparse
+import sys
+import traceback
 from dotenv import load_dotenv
 from src.tui.handler import TUIHandler
 from src.utils.config_loader import ConfigLoader
+from src.services.model_registry import ModelRegistry
 from rich.console import Console
-
 def main():
     """
     Main entrypoint for the HyDRA RAG Agent application.
     Initializes the system and starts the interactive TUI chat handler.
     """
-    # Load environment variables from a .env file
     load_dotenv()
+    # This console is primarily for startup messages and the final crash report.
+    # The TUI handler will manage its own console instance.
     console = Console()
 
-    # --- Argument Parsing ---
-    # Sets up how users can run the application from the command line.
     parser = argparse.ArgumentParser(
         description="HyDRA: An Interactive, Hybrid, and Dynamic RAG Agent.",
         formatter_class=argparse.RawTextHelpFormatter
@@ -24,7 +25,7 @@ def main():
         "--profile", 
         type=str, 
         default=os.getenv("HYDRA_PROFILE", "development"), 
-        help="The deployment profile to use (e.g., 'development', 'production_balanced').\nThis determines performance and accuracy trade-offs."
+        help="The deployment profile to use (e.g., 'development', 'production_balanced')."
     )
     parser.add_argument(
         "--user_id", 
@@ -34,33 +35,39 @@ def main():
     )
     args = parser.parse_args()
 
-    # --- API Key Validation ---
-    # Ensures the application can connect to the required LLM service.
     gemini_api_key = os.getenv("GEMINI_API_KEY")
     if not gemini_api_key or "YOUR_GOOGLE_API_KEY_HERE" in gemini_api_key:
         console.print("[bold red]ERROR: GEMINI_API_KEY is not set.[/bold red]")
-        console.print("Please create a '.env' file, add your key (e.g., GEMINI_API_KEY=\"your-key\"), and try again.")
+        console.print("Please create a '.env' file, add your key, and try again.")
         return
 
-    # --- Configuration Loading ---
-    # This crucial step loads the selected deployment profile, which dictates
-    # how all other modules (retrieval, indexing, etc.) will behave.
     try:
+        # Load the configuration once at the start.
         ConfigLoader.load(args.profile)
+        # Initialize the centralized models once.
+        ModelRegistry.initialize_models()
     except ValueError as e:
         console.print(f"[bold red]ERROR: Invalid profile specified.[/bold red]")
         console.print(f"{e}")
         return
         
-    # --- Application Launch ---
-    # Initializes and starts the main Terminal User Interface handler.
     try:
+        # The TUI handler now contains all the main application logic.
         tui = TUIHandler(user_id=args.user_id, profile=args.profile)
         tui.start_chat()
     except Exception as e:
-        console.print(f"\n[bold red]A critical error occurred during application runtime:[/bold red]")
-        console.print(f"{e}")
-        console.print("Please check your configuration and ensure all services (like Milvus) are running correctly.")
+        # --- Robust, Final Crash Handler ---
+        # This block is the last line of defense. It prints a detailed
+        # traceback to the standard console, avoiding the rich console
+        # which may be in an unstable state.
+        print("\n" + "="*80, file=sys.stderr)
+        print("A critical error occurred that terminated the TUI.", file=sys.stderr)
+        print("Please review the traceback below for details.", file=sys.stderr)
+        print("="*80 + "\n", file=sys.stderr)
+        traceback.print_exc()
+        # The TUI's own "on-error" logging should have already created a
+        # detailed crash report file. This final print is for immediate
+        # visibility in the terminal.
 
 if __name__ == "__main__":
     main()

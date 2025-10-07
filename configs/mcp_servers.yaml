@@ -1,0 +1,9 @@
+# Configuration for Model Context Protocol (MCP) servers.
+# This file allows HyDRA to connect to both local and remote tools.
+
+# The 'fetch' server provides a tool to get the full content of a web page.
+# It runs locally as a subprocess using 'uvx' for a zero-installation setup.
+fetch:
+  transport: "stdio"
+  command: "/home/hassenhamdi/.local/bin/uvx"
+  args: ["mcp-server-fetch", "--ignore-robots-txt", "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"]

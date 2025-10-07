@@ -1,8 +1,12 @@
+grpcio-tools==1.70.0
 langchain
 langchain-core
 langchain-google-genai
-pymilvus[model]==2.4.5
+pymilvus[model]
 python-dotenv
 pyyaml
-duckduckgo-search
+asyncddgs
 rich
+langchain-community
+langchain-mcp-adapters
+nest-asyncio
