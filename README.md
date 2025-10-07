@@ -23,7 +23,7 @@
 ---
 
 ## Announcement:
-- New release more powerful overhaul  :  for full changelog check [Changelog.md](./docs/changlogs.md) 
+- New release more powerful overhaul  :  for full changelog check [Changelog.md](./docs/changelog.md) 
 
 ## 🎬 Project Demo
 
