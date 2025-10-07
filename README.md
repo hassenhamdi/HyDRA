@@ -125,7 +125,7 @@ graph TD
     subgraph "Layer 3: Execution & Tools"
         Executors((Executor Pool));
         VSA[AdvancedVectorSearchAgent];
-        DSA[DeepSearchAgent (Web)];
+        DSA["DeepSearchAgent (Web)"];
     end
 
     Coord -- "4. Delegate Sub-task" --> Executors;
@@ -193,7 +193,6 @@ On Windows, Milvus runs via Docker Desktop with WSL2.
 
 1.  **Ensure Docker Desktop is installed** and configured to use the WSL2 backend.
 2.  **Follow the official guide:** [Milvus Docs - Install on Windows](https://milvus.io/docs/install_standalone-windows.md)
-    - This involves downloading a `docker-compose.yml` file and running `docker-compose up -d` in your terminal.
 </details>
 
 ### 3. Clone HyDRA & Install Dependencies
