@@ -57,10 +57,16 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   }
   .toc ul { list-style-type: none; padding-left: 0; }
   .toc ul li { margin-bottom: 0.5em; }
-  .video-container { text-align: center; margin: 2.5em 0; }
-  .video-container a { display: inline-block; border: 1px solid #e1e4e8; border-radius: 8px; padding: 5px; transition: transform 0.2s ease-in-out; }
-  .video-container a:hover { transform: scale(1.02); }
-  .video-container img { max-width: 100%; display: block; border-radius: 6px; }
+  .video-container { 
+    text-align: center; 
+    margin: 2.5em 0; 
+  }
+  .demo-video {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
   details { background-color: #fafbfc; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px; margin: 1em 0; }
   summary { font-weight: 600; cursor: pointer; }
   .footer { text-align: center; margin-top: 3em; color: #6a737d; font-size: 0.9em; }
@@ -85,22 +91,26 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   <h3>Table of Contents</h3>
   <ul>
     <li><a href="#abstract">1. Abstract</a></li>
-    <li><a href="#introduction-and-motivation">2. Introduction & Motivation</a></li>
-    <li><a href="#core-methodology-the-hydra-triad">3. Core Methodology: The HyDRA Triad</a></li>
-    <li><a href="#key-features-and-technical-specifications">4. Key Features & Technical Specifications</a></li>
-    <li><a href="#getting-started-reproducibility">5. Getting Started & Reproducibility</a></li>
-    <li><a href="#citation">6. Citation</a></li>
+    <li><a href="#framework-demonstration">2. Framework Demonstration</a></li>
+    <li><a href="#introduction-and-motivation">3. Introduction & Motivation</a></li>
+    <li><a href="#core-methodology-the-hydra-triad">4. Core Methodology: The HyDRA Triad</a></li>
+    <li><a href="#key-features-and-technical-specifications">5. Key Features & Technical Specifications</a></li>
+    <li><a href="#getting-started-reproducibility">6. Getting Started & Reproducibility</a></li>
+    <li><a href="#citation">7. Citation</a></li>
   </ul>
 </nav>
 
 <!-- DEMO VIDEO -->
-<section class="video-container">
+<section id="framework-demonstration" class="video-container">
   <h2>Framework Demonstration</h2>
-  <a href="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
-" target="_blank" rel="noopener noreferrer">
-    <img src="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
-" alt="HyDRA Project Demo Video Thumbnail">
-  </a>
+  <video class="demo-video" 
+         controls 
+         playsinline
+         poster="https://github.com/user-attachments/assets/8ebbc4db-5f91-4315-bf5a-1d4acff7eafd"
+         src="https://github.com/hassenhamdi/HyDRA/blob/main/assets/Screenshot_20251007_231653.png">
+    Your browser does not support the video tag. Please visit the <a href="https://github.com/hassenhamdi/HyDRA">repository</a> to learn more.
+  </video>
+  <p style="color: #586069; font-style: italic;">A live demonstration of HyDRA's iterative reasoning and TUI.</p>
 </section>
 
 <!-- ABSTRACT -->
@@ -110,7 +120,7 @@ title: HyDRA - Hybrid Dynamic RAG Agents
 </p>
 
 <!-- INTRODUCTION & MOTIVATION -->
-<h2 id="introduction-and-motivation">2. Introduction & Motivation</h2>
+<h2 id="introduction-and-motivation">3. Introduction & Motivation</h2>
 <p>
   The field of large language models is rapidly advancing, with RAG emerging as a critical technique for grounding responses in factual knowledge. However, the majority of existing RAG implementations remain "first-generation"—they retrieve and generate in a single, fixed pass. This paradigm falls short when queries require synthesizing information from multiple sources or adjusting a search strategy based on initial findings.
 </p>
@@ -119,12 +129,12 @@ title: HyDRA - Hybrid Dynamic RAG Agents
 </p>
 
 <!-- CORE METHODOLOGY -->
-<h2 id="core-methodology-the-hydra-triad">3. Core Methodology: The HyDRA Triad</h2>
+<h2 id="core-methodology-the-hydra-triad">4. Core Methodology: The HyDRA Triad</h2>
 <p>
   HyDRA's architecture is founded on three core principles that enable it to reason, act, and learn with high proficiency.
 </p>
 
-<h3>3.1 Hierarchical Agentic Structure</h3>
+<h3>4.1 Hierarchical Agentic Structure</h3>
 <p>A clear separation of concerns ensures modularity and predictable behavior.</p>
 <ul>
   <li><strong>Meta-Planner:</strong> The strategic reasoning layer. It analyzes the query and conversation history to determine the most salient next step in the problem-solving process.</li>
@@ -132,7 +142,7 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   - <strong>Executors:</strong> The task execution layer. A pool of specialized agents with distinct tools, such as the <code>AdvancedVectorSearchAgent</code> for querying internal knowledge or the <code>DeepSearchAgent</code> for real-time web research.
 </ul>
 
-<h3>3.2 Dynamic Reasoning Loop (ReAct)</h3>
+<h3>4.2 Dynamic Reasoning Loop (ReAct)</h3>
 <p>HyDRA employs a dynamic <strong>Reasoning-Acting loop</strong>, eschewing static, pre-computed plans for a more flexible, iterative approach.</p>
 <ol>
   <li>The <code>Meta-Planner</code> observes the current state and decides on the single best <strong>action</strong> to take.</li>
@@ -140,7 +150,7 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   <li>This observation is appended to the system's history, informing a new cycle of reasoning. This loop enables HyDRA to tackle complex questions, recover from failed steps, and dynamically adjust its strategy.</li>
 </ol>
 
-<h3>3.3 Autonomous Learning (HELP/SIMPSON)</h3>
+<h3>4.3 Autonomous Learning (HELP/SIMPSON)</h3>
 <p>The <strong>Heuristic Experience-based Learning Policy (HELP)</strong> system facilitates long-term memory and self-improvement. After each user interaction, a four-stage learning cycle is initiated:</p>
 <ul>
   <li><strong>Observe & Critique:</strong> The system reviews the full conversation transcript, evaluating the efficiency and success of each step.</li>
@@ -149,7 +159,7 @@ title: HyDRA - Hybrid Dynamic RAG Agents
 </ul>
 
 <!-- FEATURES & SPECS -->
-<h2 id="key-features-and-technical-specifications">4. Key Features & Technical Specifications</h2>
+<h2 id="key-features-and-technical-specifications">5. Key Features & Technical Specifications</h2>
 <ul>
   <li><strong>State-of-the-Art Retrieval Pipeline:</strong> Implements a three-stage retrieval process:
     <ol>
@@ -165,17 +175,17 @@ title: HyDRA - Hybrid Dynamic RAG Agents
 </ul>
 
 <!-- GETTING STARTED -->
-<h2 id="getting-started-reproducibility">5. Getting Started & Reproducibility</h2>
+<h2 id="getting-started-reproducibility">6. Getting Started & Reproducibility</h2>
 <p>To replicate our setup and run the framework, please follow these steps.</p>
 
-<h3>5.1 Prerequisites</h3>
+<h3>6.1 Prerequisites</h3>
 <ul>
   <li>Python 3.10+</li>
   <li>Docker and Docker Compose</li>
   <li>A Google Gemini API Key</li>
 </ul>
 
-<h3>5.2 System Setup</h3>
+<h3>6.2 System Setup</h3>
 <details>
   <summary><strong>Click to expand setup instructions</strong></summary>
   <ol>
@@ -210,17 +220,17 @@ python -m data_processing.ingest --path ./data --profile development</code></pre
   </ol>
 </details>
 
-<h3>5.3 Running the Application</h3>
+<h3>6.3 Running the Application</h3>
 <p>Launch the interactive Terminal User Interface:</p>
 <pre><code>python main.py --profile development --user_id my_research_id</code></pre>
 
 <!-- CITATION -->
-<h2 id="citation">6. Citation</h2>
+<h2 id="citation">7. Citation</h2>
 <p>If you use HyDRA in your research, please cite the project to credit this work. We appreciate your support.</p>
 <pre><code>@software{hydra_agent_2025,
   author       = {Hassen Hamdi},
   title        = {HyDRA: Hybrid Dynamic RAG Agents},
-  month        = {July},
+  month        = {October},
   year         = {2025},
   publisher    = {GitHub},
   version      = {0.2.0},
