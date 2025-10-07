@@ -26,8 +26,10 @@
 
 See HyDRA in action! This video showcases the iterative reasoning process, the dynamic TUI, and the agent's ability to learn and adapt.
 
-[![HyDRA Project Demo](video)](assets/HyDRA_TUI.mp4)
-> *(Note: This is a placeholder. The video is coming soon!)*
+
+https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
+
+
 
 ---
 
