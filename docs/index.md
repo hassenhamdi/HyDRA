@@ -96,10 +96,11 @@ title: HyDRA - Hybrid Dynamic RAG Agents
 <!-- DEMO VIDEO -->
 <section class="video-container">
   <h2>Framework Demonstration</h2>
-  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" alt="HyDRA Project Demo Video Thumbnail">
+  <a href="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
+" target="_blank" rel="noopener noreferrer">
+    <img src="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
+" alt="HyDRA Project Demo Video Thumbnail">
   </a>
-  <p style="color: #586069; font-style: italic;">(Note: Live demo video coming soon)</p>
 </section>
 
 <!-- ABSTRACT -->
