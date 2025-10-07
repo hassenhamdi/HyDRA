@@ -247,7 +247,7 @@ Once inside, you can chat naturally or use slash commands for more control:
 
 ## 📝 Future Roadmap
 
-Our detailed roadmap is now tracked in [`roadmap.md`](./roadmap.md). Key upcoming features include comprehensive benchmarking, autonomous knowledge curation with temporal intelligence, and full multimodal support.
+Our detailed roadmap is now tracked in [`roadmap.md`](./docs/roadmap.md). Key upcoming features include comprehensive benchmarking, autonomous knowledge curation with temporal intelligence, and full multimodal support.
 
 ---
 
