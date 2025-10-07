@@ -106,8 +106,8 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   <video class="demo-video" 
          controls 
          playsinline
-         poster="https://github.com/user-attachments/assets/8ebbc4db-5f91-4315-bf5a-1d4acff7eafd"
-         src="https://github.com/hassenhamdi/HyDRA/blob/main/assets/Screenshot_20251007_231653.png">
+         poster="https://github.com/hassenhamdi/HyDRA/blob/main/assets/Screenshot_20251007_231653.png"
+         src="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378">
     Your browser does not support the video tag. Please visit the <a href="https://github.com/hassenhamdi/HyDRA">repository</a> to learn more.
   </video>
   <p style="color: #586069; font-style: italic;">A live demonstration of HyDRA's iterative reasoning and TUI.</p>
