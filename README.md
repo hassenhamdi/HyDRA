@@ -22,6 +22,9 @@
 
 ---
 
+## Announcement:
+- New release more powerful overhaul  :  for full changelog check [Changelog.md](./docs/changlogs.md) 
+
 ## 🎬 Project Demo
 
 See HyDRA in action! This video showcases the iterative reasoning process, the dynamic TUI, and the agent's ability to learn and adapt.
