@@ -106,7 +106,7 @@ title: HyDRA - Hybrid Dynamic RAG Agents
   <video class="demo-video" 
          controls 
          playsinline
-         poster="https://github.com/hassenhamdi/HyDRA/blob/main/assets/Screenshot_20251007_231653.png"
+         poster="https://github.com/hassenhamdi/HyDRA/blob/main/assets/Screenshot_20251007_231653.png?raw=true"
          src="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378">
     Your browser does not support the video tag. Please visit the <a href="https://github.com/hassenhamdi/HyDRA">repository</a> to learn more.
   </video>
@@ -243,7 +243,7 @@ python -m data_processing.ingest --path ./data --profile development</code></pre
 <footer class="footer">
   <p>
     <a href="https://github.com/hassenhamdi/HyDRA">GitHub Repository</a> |
-    <a href="https://github.com/hassenhamdi/HyDRA/blob/main/roadmap.md">Project Roadmap</a>
+    <a href="https://github.com/hassenhamdi/HyDRA/blob/main/docs/roadmap.md">Project Roadmap</a>
   </p>
   <p>Released under the MIT License.</p>
 </footer>
