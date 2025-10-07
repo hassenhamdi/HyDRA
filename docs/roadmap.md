@@ -2,7 +2,7 @@
 
 This document outlines the planned features and improvements for the HyDRA project.
 
-- [x] **Fully debugging and fix issue within project**. In its current state it is much like land full of mines (bugs 🐞🐞🐞).
+- [x] <del>**Fully debugging and fix issue within project**. In its current state it is much like land full of mines (bugs 🐞🐞🐞)</del>
 
 - [ ] **Comprehensive Testing &amp; Benchmarking:** Rigorously evaluate HyDRA's performance on standard RAG benchmarks (e.g., GAIA, HotpotQA) to quantify its accuracy and efficiency.
 
@@ -17,3 +17,5 @@ This document outlines the planned features and improvements for the HyDRA proje
 - [ ] **Hybrid Multimodal Search:** Integrate colpali model embedding raw pdf and images for seamless hybrid search across text, document and images.
 
 - [ ] Suppress INFO and Warning logging displayed in the TUI.
+
+- [ ] Add more llm providers. 
