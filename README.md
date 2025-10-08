@@ -1,5 +1,5 @@
 
-![HyDRA Banner](https://github.com/user-attachments/assets/213dd4c2-d10b-41ab-b157-8b97a987305a)
+![HyDRA Banner]()
 
 # HyDRA: Hybrid Dynamic RAG Agents
 
