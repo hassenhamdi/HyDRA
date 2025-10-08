@@ -29,7 +29,7 @@
 ## 🎬 Project Demo
 
 See HyDRA in action! This video showcases the iterative reasoning process, the dynamic TUI, and the agent's ability to learn and adapt.
-(😁 Rest assured The noisy logging output suppression is on the raodmap.) 
+(😁 Rest assured The noisy logging output suppression is on the roadmap.) 
 
 https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378
 
