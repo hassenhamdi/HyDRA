@@ -1,5 +1,5 @@
 
-![HyDRA Banner]()
+ ![HyDRA Banner](assets/hydra_chibi.png)
 
 # HyDRA: Hybrid Dynamic RAG Agents
 
