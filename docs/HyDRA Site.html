@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyDRA: Hybrid Dynamic RAG Agents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #010411;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --border-color: rgba(51, 65, 85, 0.5);
+        }
+
+        @keyframes gradient-pan {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes blob-animation {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20vw, -30vh) scale(1.2); }
+            50% { transform: translate(-25vw, 10vh) scale(0.8); }
+            75% { transform: translate(15vw, 25vh) scale(1.1); }
+        }
+
+        @keyframes draw-arrow { to { stroke-dashoffset: 0; } }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        .glassmorphism {
+            background: rgba(5, 12, 31, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .hero-bg {
+            position: relative; overflow: hidden;
+            background-color: var(--background);
+        }
+        .hero-bg::before, .hero-bg::after {
+            content: ''; position: absolute;
+            width: 50vmax; height: 50vmax;
+            border-radius: 50%; filter: blur(150px);
+            opacity: 0.15; z-index: 0;
+        }
+        .hero-bg::before { background: #0ea5e9; top: -20vh; left: -15vw; animation: blob-animation 25s infinite ease-in-out; }
+        .hero-bg::after { background: #a855f7; bottom: -25vh; right: -20vw; animation: blob-animation 25s infinite ease-in-out reverse; }
+
+        .animated-rgb-text {
+            background: linear-gradient(90deg, #ff79c6, #f1fa8c, #50fa7b, #8be9fd, #bd93f9, #ff79c6);
+            background-size: 400% auto;
+            background-clip: text;
+            -webkit-background-clip: text; color: transparent;
+            animation: gradient-pan 8s linear infinite;
+        }
+        
+        .interactive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        /* Radial gradient following the mouse */
+        .interactive-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            border: 1px solid transparent;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.15), transparent 70%);
+            z-index: 1; opacity: 0; transition: opacity 0.15s;
+        }
+        .interactive-card:hover::before { opacity: 1; }
+        .interactive-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), var(--glow-color), transparent 099%);
+            z-index: -1; opacity: 0; transition: opacity 0.15s;
+        }
+        .interactive-card:hover::after { opacity: 1; }
+        .interactive-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px -15px hsla(var(--glow-hsl), 0.7);
+            border-color: hsla(var(--glow-hsl), 0.7);
+        }
+        .interactive-card .icon-container { transition: transform 0.3s ease; }
+        .interactive-card:hover .icon-container { transform: scale(1.1); }
+
+        /* Glow color definitions */
+        .glow-sky { --glow-color: rgba(14, 165, 233, 0.15); --glow-hsl: 199, 90%, 46%; }
+        .glow-indigo { --glow-color: rgba(99, 102, 241, 0.15); --glow-hsl: 239, 84%, 67%; }
+        .glow-purple { --glow-color: rgba(168, 85, 247, 0.15); --glow-hsl: 266, 92%, 65%; }
+        .glow-magenta { --glow-color: rgba(236, 72, 153, 0.15); --glow-hsl: 333, 82%, 60%; }
+        
+        .scroll-animation { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .scroll-animation.visible { opacity: 1; transform: translateY(0); }
+
+        .code-block {
+            background-color: #0f172a; position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem; overflow: hidden;
+        }
+        .copy-btn {
+            position: absolute; top: 0.75rem; right: 0.75rem;
+            background-color: #334155; color: #94a3b8;
+            border: none; padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem; cursor: pointer;
+            transition: background-color 0.2s; z-index: 10;
+        }
+        .copy-btn:hover { background-color: #475569; }
+
+        .animated-arrow { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw-arrow 2s ease-out forwards; }
+
+        .animated-gradient-border {
+            border: 2px solid transparent; background-clip: padding-box; position: relative; border-radius: 0.75rem;
+        }
+        .animated-gradient-border::before {
+            content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(90deg, #ff79c6, #f1fa8c, #50fa7b, #8be9fd, #bd93f9, #ff79c6);
+            background-size: 400%; animation: gradient-pan 8s linear infinite; z-index: -1; border-radius: inherit;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <header class="glassmorphism fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+              <a href="#" class="flex items-center space-x-2">
+                <img src="https://raw.githubusercontent.com/hassenhamdi/HyDRA/main/assets/hydra_chibi.png" alt="HyDRA Logo" class="h-10 w-10">
+                <span class="text-2xl font-bold text-white">HyDRA</span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#why" class="text-slate-300 hover:text-sky-400 transition-colors">Why HyDRA?</a>
+                <a href="#features" class="text-slate-300 hover:text-sky-400 transition-colors">Features</a>
+                <a href="#architecture" class="text-slate-300 hover:text-sky-400 transition-colors">Architecture</a>
+                <a href="#demo" class="text-slate-300 hover:text-sky-400 transition-colors">Demo</a>
+                <a href="#setup" class="text-slate-300 hover:text-sky-400 transition-colors">Get Started</a>
+            </nav>
+            <a href="https://github.com/hassenhamdi/HyDRA" target="_blank" class="hidden md:flex items-center space-x-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg><span>GitHub</span></a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-bg min-h-screen flex items-center justify-center pt-20">
+             <div class="container mx-auto px-6 text-center z-10">
+                <img src="https://raw.githubusercontent.com/hassenhamdi/HyDRA/main/assets/hydra_chibi.png" alt="HyDRA Banner" class="w-48 h-48 md:w-64 md:h-64 mx-auto mb-6 animate-fade-in-down" style="filter: drop-shadow(0 0 2rem rgba(14, 165, 233, 0.5));">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black mb-4 animated-rgb-text animate-fade-in-down">Beyond Static RAG. Meet HyDRA.</h1>
+                <p class="max-w-3xl mx-auto text-lg md:text-xl text-slate-300 mb-8 animate-fade-in-up">An advanced, agentic AI framework that transforms Retrieval-Augmented Generation into a dynamic, learning reasoning system.</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in-up-delay">
+                    <a href="#setup" class="w-full sm:w-auto text-center font-semibold px-8 py-3 rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition-transform hover:scale-105 transform">Quick Start Guide</a>
+                    <a href="https://github.com/hassenhamdi/HyDRA" target="_blank" class="w-full sm:w-auto text-center font-semibold px-8 py-3 rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-transform hover:scale-105 transform">View on GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why HyDRA Section -->
+        <section id="why" class="py-20 md:py-32">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">Why HyDRA?</h2><p class="max-w-3xl mx-auto text-slate-400">HyDRA fuses the best ideas from groundbreaking research into a single, cohesive, and practical framework. It's an answer to building a RAG system that is not just powerful, but intelligent and adaptive.</p></div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="interactive-card glow-sky scroll-animation"><div class="mb-4 p-3 bg-sky-900/50 border border-sky-500/30 rounded-lg inline-block"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 11.2353V4L12 8.76471L20 4V11.2353L12 16L4 11.2353Z" fill="#22d3ee" fill-opacity="0.3"/><path d="M4 12.7647V20L12 15.2353L20 20V12.7647L12 18L4 12.7647Z" fill="#0ea5e9"/><path d="M20 4L12 8.76471L4 4M20 11.2353L12 16L4 11.2353M20 12.7647L12 18L4 12.7647M12 8.76471V15.2353" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 class="text-lg font-bold text-sky-300 mb-2">Hierarchical Structure</h3><p class="text-sm text-slate-400">Adopts the robust, three-layer agentic structure from <span class="font-semibold text-slate-300">HiRA</span> for a clean separation of strategy and execution.</p></div>
+                    <div class="interactive-card glow-indigo scroll-animation" style="transition-delay: 100ms;"><div class="mb-4 p-3 bg-indigo-900/50 border border-indigo-500/30 rounded-lg inline-block"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 4 6 4 12C4 18 12 22 12 22C12 22 20 18 20 12C20 6 12 2 12 2Z" fill="#6366f1" fill-opacity="0.3"/><path d="M16 8L12 12L8 8" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12L12 16L16 12" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2V22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 class="text-lg font-bold text-indigo-300 mb-2">Multi-Source Retrieval</h3><p class="text-sm text-slate-400">Implements the multi-agent, multi-source philosophy of <span class="font-semibold text-slate-300">HM-RAG</span> for comprehensive data gathering.</p></div>
+                    <div class="interactive-card glow-purple scroll-animation" style="transition-delay: 200ms;"><div class="mb-4 p-3 bg-purple-900/50 border border-purple-500/30 rounded-lg inline-block"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12Z" fill="#a855f7" fill-opacity="0.3"/><path d="M10 8L4 12L10 16" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 8L20 12L14 16" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 class="text-lg font-bold text-purple-300 mb-2">Semantic Bridge</h3><p class="text-sm text-slate-400">Leverages the <span class="font-semibold text-slate-300">HyDE</span> technique to bridge the gap between user queries and stored documents.</p></div>
+                    <div class="interactive-card glow-magenta scroll-animation" style="transition-delay: 300ms;"><div class="mb-4 p-3 bg-pink-900/50 border border-pink-500/30 rounded-lg inline-block"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 15C15.866 15 19 13.2091 19 11C19 8.79086 15.866 7 12 7C8.13401 7 5 8.79086 5 11C5 13.2091 8.13401 15 12 15Z" fill="#ec4899" fill-opacity="0.3"/><path d="M19 11V17C19 19.2091 15.866 21 12 21C8.13401 21 5 19.2091 5 17V11" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5C5 7.20914 8.13401 9 12 9C15.866 9 19 7.20914 19 5" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 class="text-lg font-bold text-pink-300 mb-2">Unified Backend</h3><p class="text-sm text-slate-400">Powered by <span class="font-semibold text-slate-300">Milvus</span> and <span class="font-semibold text-slate-300">BGE-M3</span> for state-of-the-art hybrid search and agent memory.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The HyDRA Approach Section -->
+        <section id="pillars" class="py-20 md:py-32 bg-slate-900/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">The HyDRA Approach</h2><p class="max-w-3xl mx-auto text-slate-400">HyDRA's intelligence is built on three foundational pillars that work in concert.</p></div>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="interactive-card glow-sky text-center scroll-animation"><div class="mb-4 inline-block p-4 bg-sky-900/50 rounded-lg border border-sky-500/30"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div><h3 class="text-xl font-bold mb-2">1. Hierarchical Agents</h3><p class="text-slate-400">A clear separation of concerns: The <span class="text-white">Meta-Planner</span> strategizes, the <span class="text-white">Coordinator</span> manages, and <span class="text-white">Executors</span> perform specialized tasks.</p></div>
+                    <div class="interactive-card glow-purple text-center scroll-animation" style="transition-delay: 200ms;"><div class="mb-4 inline-block p-4 bg-purple-900/50 rounded-lg border border-purple-500/30"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div><h3 class="text-xl font-bold mb-2">2. Iterative Reasoning (ReAct)</h3><p class="text-slate-400">A dynamic Reason-Act-Observe loop allows HyDRA to tackle multi-hop questions, recover from failures, and adjust its strategy on the fly.</p></div>
+                    <div class="interactive-card glow-indigo text-center scroll-animation" style="transition-delay: 400ms;"><div class="mb-4 inline-block p-4 bg-indigo-900/50 rounded-lg border border-indigo-500/30"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path><path d="M12 2v6l2 2"></path></svg></div><h3 class="text-xl font-bold mb-2">3. Autonomous Learning (HELP)</h3><p class="text-slate-400">A long-term memory and self-improvement cycle: Observe, Critique, Memorize, and Adapt, making the system smarter with every interaction.</p></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Core Features Section -->
+        <section id="features" class="py-20 md:py-32">
+            <div class="container mx-auto px-6"><div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">Core Features</h2></div>
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="interactive-card glow-sky scroll-animation"><h3 class="font-semibold text-white mb-2">Three-Layer Agentic Architecture</h3><p class="text-sm text-slate-400">Planner for strategy, Coordinator for delegation, and Executors for tasks.</p></div>
+                    <div class="interactive-card glow-indigo scroll-animation" style="transition-delay: 100ms;"><h3 class="font-semibold text-white mb-2">Iterative ReAct-style Agents</h3><p class="text-sm text-slate-400">Moves beyond static plans to dynamic, multi-step reasoning.</p></div>
+                    <div class="interactive-card glow-purple scroll-animation" style="transition-delay: 200ms;"><h3 class="font-semibold text-white mb-2">Continuous Self-Improvement</h3><p class="text-sm text-slate-400">A learning loop that analyzes past performance to optimize future actions.</p></div>
+                    <div class="interactive-card glow-magenta scroll-animation" style="transition-delay: 300ms;"><h3 class="font-semibold text-white mb-2">State-of-the-Art Retrieval</h3><p class="text-sm text-slate-400">Combines Hybrid Search (dense + sparse), RRF, and a BGE Reranker.</p></div>
+                    <div class="interactive-card glow-sky scroll-animation" style="transition-delay: 400ms;"><h3 class="font-semibold text-white mb-2">Adaptive Retrieval Strategies</h3><p class="text-sm text-slate-400">Autonomously uses techniques like HyDE for conceptual queries.</p></div>
+                    <div class="interactive-card glow-indigo scroll-animation" style="transition-delay: 500ms;"><h3 class="font-semibold text-white mb-2">Interactive TUI</h3><p class="text-sm text-slate-400">A rich Terminal UI with streaming, commands, and knowledge management.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="py-20 md:py-32 bg-slate-900/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">Architecture Flow</h2><p class="max-w-3xl mx-auto text-slate-400">A dynamic loop of strategy, execution, and learning creates a continuous cycle of improvement.</p></div>
+                <div class="relative grid lg:grid-cols-3 gap-8 items-start">
+                    <div class="interactive-card glow-sky scroll-animation z-10"><h3 class="text-xl font-bold mb-3 text-sky-300">1. Strategy & Planning</h3><p class="text-slate-400">The loop begins when a user query is received. The <span class="text-white">Meta-Planner Agent</span> analyzes the goal and devises the single most logical next step, creating an actionable sub-task.</p></div>
+                    <div class="interactive-card glow-purple scroll-animation z-10" style="transition-delay: 200ms;"><h3 class="text-xl font-bold mb-3 text-purple-300">2. Coordination & Execution</h3><p class="text-slate-400">The <span class="text-white">Adaptive Coordinator</span> receives the sub-task. Guided by learned policies from the <span class="text-white">Memory Agent</span>, it delegates the task to the best specialized <span class="text-white">Executor</span> (e.g., Vector Search or Web Search).</p></div>
+                    <div class="interactive-card glow-magenta scroll-animation z-10" style="transition-delay: 400ms;"><h3 class="text-xl font-bold mb-3 text-pink-300">3. Synthesis & Learning</h3><p class="text-slate-400">The result is passed to the <span class="text-white">Synthesis Agent</span> and fed back to the Planner. After the interaction, the <span class="text-white">Post-Interaction Analyzer</span> critiques the process, updating the Memory Agent with new insights, making the system smarter for the next query.</p></div>
+                    <svg class="absolute top-0 left-0 w-full h-full hidden lg:block" aria-hidden="true">
+                        <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="rgba(139, 233, 253, 0.4)" /></marker></defs>
+                        <path d="M300 120 Q 380 120, 460 120" stroke="rgba(139, 233, 253, 0.4)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" class="animated-arrow" style="animation-delay: 0.5s;"/>
+                        <path d="M630 120 Q 710 120, 750 250 Q 710 380, 630 380 Q 400 380, 200 380" stroke="rgba(139, 233, 253, 0.4)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" class="animated-arrow" style="animation-delay: 1s;"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Section -->
+        <section id="demo" class="py-20 md:py-32">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">See HyDRA in Action</h2><p class="max-w-3xl mx-auto text-slate-400">This video showcases the iterative reasoning process, the dynamic TUI, and the agent's ability to learn and adapt.</p></div>
+                <div class="max-w-4xl mx-auto rounded-xl shadow-2xl shadow-sky-500/10 animated-gradient-border scroll-animation p-1">
+                     <video controls muted autoplay loop class="w-full rounded-lg">
+                         <source src="https://github.com/user-attachments/assets/327a96a7-e45e-474c-9984-9d63032d5378" type="video/mp4">Your browser does not support the video tag.
+                     </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- Get Started Section -->
+        <section id="setup" class="py-20 md:py-32 bg-slate-900/90">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-16 scroll-animation"><h2 class="text-3xl md:text-4xl font-bold mb-4">Installation & Setup</h2><p class="max-w-3xl mx-auto text-slate-400">Get HyDRA up and running in a few simple steps.</p></div>
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="scroll-animation"><h3 class="flex items-center text-xl font-semibold mb-4 text-sky-300"><span class="bg-slate-700 text-sky-300 rounded-full w-8 h-8 inline-flex items-center justify-center mr-4">1</span>Install Milvus Standalone</h3><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre class="p-4"><code class="language-bash text-slate-300">curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+bash standalone_embed.sh start</code></pre></div></div>
+                    <div class="scroll-animation"><h3 class="flex items-center text-xl font-semibold mb-4 text-sky-300"><span class="bg-slate-700 text-sky-300 rounded-full w-8 h-8 inline-flex items-center justify-center mr-4">2</span>Clone & Install Dependencies</h3><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre class="p-4"><code class="language-bash text-slate-300">git clone https://github.com/hassenhamdi/HyDRA.git
+cd HyDRA
+pip install -r requirements.txt</code></pre></div></div>
+                    <div class="scroll-animation"><h3 class="flex items-center text-xl font-semibold mb-4 text-sky-300"><span class="bg-slate-700 text-sky-300 rounded-full w-8 h-8 inline-flex items-center justify-center mr-4">3</span>Configure Environment</h3><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre class="p-4"><code class="language-bash text-slate-300">cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY</code></pre></div></div>
+                    <div class="scroll-animation"><h3 class="flex items-center text-xl font-semibold mb-4 text-sky-300"><span class="bg-slate-700 text-sky-300 rounded-full w-8 h-8 inline-flex items-center justify-center mr-4">4</span>Ingest Your Data</h3><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre class="p-4"><code class="language-bash text-slate-300"># Setup Milvus collections
+python -m src.services.milvus_setup --profile development
+
+# Ingest data
+python -m data_processing.ingest --path ./data --profile development</code></pre></div></div>
+                    <div class="scroll-animation"><h3 class="flex items-center text-xl font-semibold mb-4 text-sky-300"><span class="bg-slate-700 text-sky-300 rounded-full w-8 h-8 inline-flex items-center justify-center mr-4">5</span>Launch the TUI</h3><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre class="p-4"><code class="language-bash text-slate-300">python main.py --profile production_balanced --user_id alex</code></pre></div></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-800">
+         <div class="container mx-auto px-6 py-8 text-center text-slate-400 text-sm"><p>&copy; 2025 Hassen Hamdi. Licensed under the MIT License.</p><p class="mt-2">HyDRA is built upon the foundational work of HiRA, HM-RAG, HyDE, and other groundbreaking research.</p></div>
+    </footer>
+    
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.scroll-animation').forEach(el => observer.observe(el));
+
+        function copyCode(button) {
+            const code = button.nextElementSibling.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                button.innerText = 'Copied!';
+                setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+            });
+        }
+        
+        document.querySelectorAll('.interactive-card').forEach(card => {
+            card.onmousemove = e => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            }
+        });
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+        @keyframes fade-in-down { 0% { opacity: 0; transform: translateY(-20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fade-in-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-down { animation: fade-in-down 0.8s ease-out forwards; }
+        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out 0.2s forwards; }
+        .animate-fade-in-up-delay { animation: fade-in-up 0.8s ease-out 0.4s forwards; }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
